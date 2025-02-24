@@ -8,6 +8,7 @@ import Header from "./components/Header"
 import Footer from "./components/Footer"
 import EmailVerification from "./pages/EmailVerification"
 import Accordion from "./pages/Accordion"
+import PacketCapture from "./pages/packetCapture"
 
 const appRouter = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const appRouter = createBrowserRouter([
 ,     {
         path:"/login",
         element: <Login/>
+      },
+      {
+        path:"/PacketCapture",
+        element:<PacketCapture/>
       },
       {
         path:"/register",

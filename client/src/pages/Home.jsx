@@ -22,9 +22,11 @@ const Home = () => {
           </p>
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:relative lg:px-6 px-2">
+          <Link to="/PacketCapture">
           <button className="bg-black p-3 font-sans font-light rounded-md w-full sm:w-auto text-left">
-            Learn More
+            Test Your Firewall
           </button>
+          </Link>
           <Link to="/register">
           <button className="text-black border-gray-300 border-2 px-4 rounded-md p-3 font-sans font-light w-full sm:w-auto text-left">
              Register
