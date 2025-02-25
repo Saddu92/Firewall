@@ -9,6 +9,7 @@ import Footer from "./components/Footer"
 import EmailVerification from "./pages/EmailVerification"
 import Accordion from "./pages/Accordion"
 import PacketCapture from "./pages/packetCapture"
+import CsvAnalyzer from "./pages/CsvAnalyzer"
 
 const appRouter = createBrowserRouter([
   {
@@ -40,6 +41,11 @@ const appRouter = createBrowserRouter([
       {
         path:"/PacketCapture",
         element:<PacketCapture/>
+      },
+      
+      {
+        path:"/csv_analyzer",
+        element:<CsvAnalyzer/>
       },
       {
         path:"/register",

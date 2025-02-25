@@ -2,19 +2,34 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
 
-function PacketCapture() {
+function CsvAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [predictions, setPredictions] = useState([]);
   const [alert, setAlert] = useState("");
   const [packetData, setPacketData] = useState([]);
 
-  const startCapture = async () => {
+  // Handle file upload
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
     setLoading(true);
     setAlert("");
+    setPredictions([]);
+    setPacketData([]);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const response = await axios.post("http://127.0.0.1:8000/start-capture-and-predict/");
+      const response = await axios.post("http://127.0.0.1:8000/predict-csv/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       setPredictions(response.data.predictions);
-      setPacketData(response.data.packet_data); // Set packet data from backend
+      setPacketData(response.data.packet_data);
 
       // Show an alert if a threat is detected
       if (response.data.predictions.includes(1)) {
@@ -22,6 +37,7 @@ function PacketCapture() {
       }
     } catch (error) {
       console.error("Error:", error);
+      setAlert("Failed to process the CSV file.");
     } finally {
       setLoading(false);
     }
@@ -37,17 +53,21 @@ function PacketCapture() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-8">
-      <h1 className="text-3xl font-bold">Proactive Firewall Dashboard</h1>
+      <h1 className="text-3xl font-bold">CSV Packet Analyzer</h1>
 
       {alert && <div className="bg-red-500 p-2 rounded mt-3">{alert}</div>}
 
-      <button 
-        onClick={startCapture} 
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5"
-        disabled={loading}
-      >
-        {loading ? "Capturing..." : "Start Packet Capture"}
-      </button>
+      <div className="mt-5">
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleFileUpload}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={loading}
+        />
+      </div>
+
+      {loading && <div className="mt-3">Processing CSV file...</div>}
 
       {predictions.length > 0 && (
         <div className="w-full flex flex-col items-center mt-6">
@@ -75,7 +95,7 @@ function PacketCapture() {
           </div>
 
           <div className="w-full mt-8">
-            <h2 className="text-xl font-semibold">Captured Packets with Predictions</h2>
+            <h2 className="text-xl font-semibold">Packet Data with Predictions</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full bg-gray-800 text-white">
                 <thead>
@@ -94,12 +114,12 @@ function PacketCapture() {
                   {packetData.map((packet, index) => (
                     <tr key={index} className="border-b border-gray-700">
                       <td className="px-4 py-2">{index + 1}</td>
-                      <td className="px-4 py-2">{packet['Source IP']}</td>
-                      <td className="px-4 py-2">{packet['Destination IP']}</td>
-                      <td className="px-4 py-2">{packet['Protocol']}</td>
-                      <td className="px-4 py-2">{packet['Source Port']}</td>
-                      <td className="px-4 py-2">{packet['Destination Port']}</td>
-                      <td className="px-4 py-2">{packet['Packet Length']}</td>
+                      <td className="px-4 py-2">{packet['Source IP'] || 'N/A'}</td>
+                      <td className="px-4 py-2">{packet['Destination IP'] || 'N/A'}</td>
+                      <td className="px-4 py-2">{packet['Protocol'] || 'N/A'}</td>
+                      <td className="px-4 py-2">{packet['Source Port'] || 'N/A'}</td>
+                      <td className="px-4 py-2">{packet['Destination Port'] || 'N/A'}</td>
+                      <td className="px-4 py-2">{packet['Packet Length'] || 'N/A'}</td>
                       <td className="px-4 py-2">
                         <span className={`px-2 py-1 rounded ${predictions[index] === 1 ? 'bg-red-500' : 'bg-green-500'}`}>
                           {predictions[index] === 1 ? 'Threat' : 'Normal'}
@@ -117,4 +137,4 @@ function PacketCapture() {
   );
 }
 
-export default PacketCapture;
+export default CsvAnalyzer;
